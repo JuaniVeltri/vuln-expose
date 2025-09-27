@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from '@vercel/analytics/react';
 import "./globals.css";
 import DatabaseInitializer from "./components/DatabaseInitializer";
+import VercelInstrumentation from "./components/VercelInstrumentation";
+import { AuthProvider } from "./context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,9 +63,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <DatabaseInitializer />
-        {children}
-        <Analytics />
+        <AuthProvider>
+          <DatabaseInitializer />
+          {children}
+          <VercelInstrumentation
+            debug={process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_DEBUG === 'true' || process.env.NODE_ENV === 'development'}
+            sampleRate={parseFloat(process.env.NEXT_PUBLIC_VERCEL_SPEED_INSIGHTS_SAMPLE_RATE || '1.0')}
+            framework="nextjs"
+          />
+        </AuthProvider>
       </body>
     </html>
   );

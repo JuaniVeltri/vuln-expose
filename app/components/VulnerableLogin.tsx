@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSecurityAnalytics } from '@/app/hooks/useSecurityAnalytics';
 
 interface User {
   id: number;
@@ -17,10 +18,25 @@ export default function VulnerableLogin() {
   const [error, setError] = useState('');
   const [showPayload, setShowPayload] = useState(false);
 
+  const { trackSQLInjection, trackAuthenticationBypass, trackVulnerabilityPageVisit } = useSecurityAnalytics();
+
+  // Track page visit when component mounts
+  useEffect(() => {
+    trackVulnerabilityPageVisit('SQL Injection Login', 'authentication_bypass');
+  }, [trackVulnerabilityPageVisit]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    const startTime = performance.now();
+
+    // Detect potential SQL injection in username
+    const isSQLInjection = username.includes("'") || username.includes("--") ||
+                          username.toLowerCase().includes(" or ") ||
+                          username.toLowerCase().includes("union") ||
+                          username.toLowerCase().includes("1=1");
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -32,14 +48,32 @@ export default function VulnerableLogin() {
       });
 
       const data = await response.json();
+      const endTime = performance.now();
 
       if (data.success) {
         setUser(data.user);
+
+        // Track successful authentication (potentially bypassed)
+        if (isSQLInjection) {
+          trackSQLInjection(username, true, '/api/auth/login');
+          trackAuthenticationBypass('SQL Injection', true, username);
+        } else {
+          trackAuthenticationBypass('Normal Login', true, username);
+        }
       } else {
         setError(data.message);
+
+        // Track failed authentication attempt
+        if (isSQLInjection) {
+          trackSQLInjection(username, false, '/api/auth/login');
+          trackAuthenticationBypass('SQL Injection', false, username);
+        } else {
+          trackAuthenticationBypass('Normal Login', false, username);
+        }
       }
     } catch (err) {
       setError('Login failed');
+      trackAuthenticationBypass('Error', false, username);
     } finally {
       setLoading(false);
     }

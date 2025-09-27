@@ -176,21 +176,26 @@ export default function XSSProfilePage() {
               )}
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4">Búsqueda en Perfil (XSS Reflejado)</h3>
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-purple-500/30">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                <span className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
+                  🔍
+                </span>
+                Búsqueda en Perfil (XSS Reflejado)
+              </h3>
 
-              <form onSubmit={handleSearch} className="mb-4">
-                <div className="flex gap-2">
+              <form onSubmit={handleSearch} className="mb-6">
+                <div className="flex gap-3">
                   <input
                     type="text"
                     value={reflectedSearch}
                     onChange={(e) => setReflectedSearch(e.target.value)}
                     placeholder="Buscar en perfiles... (ej: <script>alert('XSS')</script>)"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 font-medium"
                   >
                     Buscar
                   </button>
@@ -198,13 +203,13 @@ export default function XSSProfilePage() {
               </form>
 
               {searchResult && (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-black mb-2">Resultados para:</p>
+                <div className="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+                  <p className="text-sm text-yellow-300 mb-2">Resultados para:</p>
                   <div
-                    className="font-medium"
+                    className="font-medium text-white"
                     dangerouslySetInnerHTML={{ __html: `"${searchResult}"` }}
                   />
-                  <p className="text-xs text-black mt-2">No se encontraron resultados.</p>
+                  <p className="text-xs text-yellow-400 mt-2">No se encontraron resultados.</p>
                 </div>
               )}
             </div>
@@ -212,89 +217,124 @@ export default function XSSProfilePage() {
 
           <div className="space-y-6">
             {isEditing && (
-              <div className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="font-semibold mb-3 text-red-600">Payloads XSS para Perfil</h3>
-                <div className="space-y-2">
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-6 border border-red-500/30">
+                <h3 className="text-xl font-bold mb-4 text-red-400 flex items-center">
+                  <span className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center mr-3">
+                    💥
+                  </span>
+                  Payloads XSS para Perfil
+                </h3>
+                <div className="space-y-3">
                   <button
                     onClick={() => insertXSSPayload('name', '<script>alert("XSS en nombre")</script>')}
-                    className="w-full text-left px-3 py-2 bg-red-50 hover:bg-red-100 rounded text-sm"
+                    className="w-full text-left px-4 py-3 bg-red-900/20 hover:bg-red-900/30 border border-red-500/30 hover:border-red-400/50 rounded-lg text-sm text-white transition-all duration-300"
                   >
-                    Script en Nombre
+                    🔥 Script en Nombre
                   </button>
                   <button
                     onClick={() => insertXSSPayload('bio', '<img src="x" onerror="alert(\'XSS en bio\')" />')}
-                    className="w-full text-left px-3 py-2 bg-red-50 hover:bg-red-100 rounded text-sm"
+                    className="w-full text-left px-4 py-3 bg-red-900/20 hover:bg-red-900/30 border border-red-500/30 hover:border-red-400/50 rounded-lg text-sm text-white transition-all duration-300"
                   >
-                    Image en Bio
+                    🖼️ Image en Bio
                   </button>
                   <button
                     onClick={() => insertXSSPayload('website', '<a href="javascript:alert(\'XSS en web\')">Click aquí</a>')}
-                    className="w-full text-left px-3 py-2 bg-red-50 hover:bg-red-100 rounded text-sm"
+                    className="w-full text-left px-4 py-3 bg-red-900/20 hover:bg-red-900/30 border border-red-500/30 hover:border-red-400/50 rounded-lg text-sm text-white transition-all duration-300"
                   >
-                    Link malicioso
+                    🔗 Link malicioso
                   </button>
                   <button
                     onClick={() => insertXSSPayload('location', '<svg onload="alert(\'XSS en ubicación\')" />')}
-                    className="w-full text-left px-3 py-2 bg-red-50 hover:bg-red-100 rounded text-sm"
+                    className="w-full text-left px-4 py-3 bg-red-900/20 hover:bg-red-900/30 border border-red-500/30 hover:border-red-400/50 rounded-lg text-sm text-white transition-all duration-300"
                   >
-                    SVG en Ubicación
+                    📍 SVG en Ubicación
                   </button>
                 </div>
               </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="font-semibold mb-3 text-orange-600">Payloads para Búsqueda</h3>
-              <div className="space-y-2">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-6 border border-orange-500/30">
+              <h3 className="text-xl font-bold mb-4 text-orange-400 flex items-center">
+                <span className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center mr-3">
+                  🔍
+                </span>
+                Payloads para Búsqueda
+              </h3>
+              <div className="space-y-3">
                 <button
                   onClick={() => insertSearchPayload('<script>alert("XSS reflejado")</script>')}
-                  className="w-full text-left px-3 py-2 bg-orange-50 hover:bg-orange-100 rounded text-sm"
+                  className="w-full text-left px-4 py-3 bg-orange-900/20 hover:bg-orange-900/30 border border-orange-500/30 hover:border-orange-400/50 rounded-lg text-sm text-white transition-all duration-300"
                 >
-                  Script básico
+                  🔥 Script básico
                 </button>
                 <button
                   onClick={() => insertSearchPayload('<img src=x onerror=alert("Reflected")>')}
-                  className="w-full text-left px-3 py-2 bg-orange-50 hover:bg-orange-100 rounded text-sm"
+                  className="w-full text-left px-4 py-3 bg-orange-900/20 hover:bg-orange-900/30 border border-orange-500/30 hover:border-orange-400/50 rounded-lg text-sm text-white transition-all duration-300"
                 >
-                  Image onerror
+                  🖼️ Image onerror
                 </button>
                 <button
                   onClick={() => insertSearchPayload('<svg/onload=alert("SVG")>')}
-                  className="w-full text-left px-3 py-2 bg-orange-50 hover:bg-orange-100 rounded text-sm"
+                  className="w-full text-left px-4 py-3 bg-orange-900/20 hover:bg-orange-900/30 border border-orange-500/30 hover:border-orange-400/50 rounded-lg text-sm text-white transition-all duration-300"
                 >
-                  SVG compacto
+                  📐 SVG compacto
                 </button>
                 <button
                   onClick={() => insertSearchPayload('"><script>alert("Escape")</script>')}
-                  className="w-full text-left px-3 py-2 bg-orange-50 hover:bg-orange-100 rounded text-sm"
+                  className="w-full text-left px-4 py-3 bg-orange-900/20 hover:bg-orange-900/30 border border-orange-500/30 hover:border-orange-400/50 rounded-lg text-sm text-white transition-all duration-300"
                 >
-                  Escape atributo
+                  🔓 Escape atributo
                 </button>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="font-semibold mb-3 text-blue-600">Tipos de XSS aquí</h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <h4 className="font-medium text-red-600">Stored XSS</h4>
-                  <p className="text-black">En campos del perfil que se guardan y muestran</p>
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-6 border border-blue-500/30">
+              <h3 className="text-xl font-bold mb-4 text-blue-400 flex items-center">
+                <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  📋
+                </span>
+                Tipos de XSS aquí
+              </h3>
+              <div className="space-y-4 text-sm">
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                  <h4 className="font-semibold text-red-400 mb-2">💾 Stored XSS</h4>
+                  <p className="text-gray-300">En campos del perfil que se guardan y muestran</p>
                 </div>
-                <div>
-                  <h4 className="font-medium text-orange-600">Reflected XSS</h4>
-                  <p className="text-black">En la búsqueda que refleja la entrada inmediatamente</p>
+                <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
+                  <h4 className="font-semibold text-orange-400 mb-2">🔄 Reflected XSS</h4>
+                  <p className="text-gray-300">En la búsqueda que refleja la entrada inmediatamente</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="font-semibold mb-3 text-green-600">Contramedidas</h3>
-              <ul className="text-sm space-y-1">
-                <li>• Validación de entrada</li>
-                <li>• Encoding de salida</li>
-                <li>• Content Security Policy</li>
-                <li>• HttpOnly cookies</li>
-                <li>• HTTPS obligatorio</li>
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-2xl p-6 border border-green-500/30">
+              <h3 className="text-xl font-bold mb-4 text-green-400 flex items-center">
+                <span className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+                  🛡️
+                </span>
+                Contramedidas
+              </h3>
+              <ul className="text-sm space-y-3 text-gray-300">
+                <li className="flex items-center">
+                  <span className="text-green-400 mr-2">✓</span>
+                  Validación de entrada
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-400 mr-2">✓</span>
+                  Encoding de salida
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-400 mr-2">✓</span>
+                  Content Security Policy
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-400 mr-2">✓</span>
+                  HttpOnly cookies
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-400 mr-2">✓</span>
+                  HTTPS obligatorio
+                </li>
               </ul>
             </div>
           </div>
