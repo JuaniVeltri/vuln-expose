@@ -1,9 +1,28 @@
 import VulnerableLogin from "@/app/components/VulnerableLogin";
 import Link from "next/link";
+import { Metadata } from "next";
+import StructuredData from "@/app/components/StructuredData";
+
+export const metadata: Metadata = {
+  title: "SQL Injection Authentication Bypass | VulnSite",
+  description: "Learn and practice SQL injection authentication bypass techniques. Educational platform for testing login vulnerabilities and pentesting authentication systems.",
+  keywords: "SQL injection login, authentication bypass, SQL injection tutorial, login vulnerability, pentesting authentication",
+  openGraph: {
+    title: "SQL Injection Authentication Bypass - VulnSite",
+    description: "Practice SQL injection techniques for bypassing authentication systems",
+  },
+};
 
 export default function SQLiLoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-red-900">
+    <>
+      <StructuredData
+        type="vulnerability-page"
+        title="SQL Injection Authentication Bypass"
+        description="Learn and practice SQL injection authentication bypass techniques"
+        vulnerabilityType="SQL Injection"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-red-900">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <Link
@@ -132,5 +151,6 @@ export default function SQLiLoginPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

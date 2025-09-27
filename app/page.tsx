@@ -1,8 +1,22 @@
 import Link from "next/link";
+import { Metadata } from "next";
+import StructuredData from "./components/StructuredData";
+
+export const metadata: Metadata = {
+  title: "VulnSite - Home | Web Security Testing Platform",
+  description: "Learn and practice web security vulnerabilities including SQL injection, XSS, and other penetration testing techniques in a safe educational environment.",
+  keywords: "web security home, penetration testing platform, SQL injection practice, XSS testing, cybersecurity training",
+  openGraph: {
+    title: "VulnSite - Web Security Testing Platform",
+    description: "Educational platform for practicing web vulnerabilities like SQL injection and XSS",
+  },
+};
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-red-900">
+    <>
+      <StructuredData type="homepage" />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-red-900">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-4">
@@ -194,5 +208,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </>
   );
 }
