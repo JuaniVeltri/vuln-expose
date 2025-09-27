@@ -1,0 +1,9 @@
+vulnerable.db
+node_modules
+.next
+.git
+*.sqlite
+*.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
