@@ -168,11 +168,14 @@ export async function executeQuery(query: string, params: any[] = []): Promise<a
       if (lowerQuery.includes('from products')) {
         const products = (await getFromKV('products')) as Product[] || initialData.products;
 
-        if (lowerQuery.includes('like')) {
-          // UNION injection en productos
-          if (lowerQuery.includes('union')) {
-            console.log('🚨 UNION injection en productos! Devolviendo datos de usuarios');
-            const users = (await getFromKV('users')) as User[] || initialData.users;
+        // Advanced UNION injection patterns
+        if (lowerQuery.includes('union')) {
+          console.log('🚨 UNION injection detected! Returning user data');
+          const users = (await getFromKV('users')) as User[] || initialData.users;
+
+          // Different UNION patterns
+          if (lowerQuery.includes('select id,username,password,email') ||
+              lowerQuery.includes('select username,password,email,role')) {
             return users.map(u => ({
               id: u.id,
               name: u.username,
@@ -182,14 +185,58 @@ export async function executeQuery(query: string, params: any[] = []): Promise<a
             }));
           }
 
-          // Búsqueda normal
+          // Generic UNION
+          return users.map(u => ({
+            id: u.id,
+            name: u.username,
+            description: u.password,
+            price: u.email,
+            category: u.role
+          }));
+        }
+
+        // Boolean-based injection
+        if (lowerQuery.includes('count(*)') && lowerQuery.includes('users')) {
+          console.log('🚨 Boolean-based injection detected!');
+          const users = (await getFromKV('users')) as User[] || initialData.users;
+          const adminExists = users.some(u => u.role === 'admin');
+          return adminExists ? products : [];
+        }
+
+        // Error-based injection patterns
+        if (lowerQuery.includes('extractvalue') || lowerQuery.includes('concat(0x7e')) {
+          console.log('🚨 Error-based injection detected! Exposing user data');
+          const users = (await getFromKV('users')) as User[] || initialData.users;
+          throw new Error(`Error: ~${users[0].password}~ (SQL Error simulation)`);
+        }
+
+        // LIKE search with potential injection
+        if (lowerQuery.includes('like')) {
           const searchTerm = params[0] || '';
+
+          // Check for injection patterns
+          if (searchTerm.includes("'") || lowerQuery.includes(" or ") || lowerQuery.includes("--")) {
+            console.log('🚨 SQL injection in LIKE clause detected!');
+            if (lowerQuery.includes(" or ") || lowerQuery.includes("1=1")) {
+              return products; // Return all products for OR injection
+            }
+          }
+
           return products.filter(p =>
             p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             p.description.toLowerCase().includes(searchTerm.toLowerCase())
           );
         }
+
+        // Table name injection (when products is replaced)
         return products;
+      }
+
+      // Table injection - when table parameter is manipulated
+      if (lowerQuery.includes('from users where 1=1')) {
+        console.log('🚨 Table injection detected! Accessing users table');
+        const users = (await getFromKV('users')) as User[] || initialData.users;
+        return users;
       }
 
       // Comments table
@@ -201,6 +248,59 @@ export async function executeQuery(query: string, params: any[] = []): Promise<a
           return comments.filter(c => c.post_id === postId);
         }
         return comments;
+      }
+    }
+
+    // ORDER BY injection patterns
+    if (lowerQuery.includes('order by')) {
+      console.log('🔍 Checking ORDER BY clause for injection...');
+
+      // Case-based ORDER BY injection
+      if (lowerQuery.includes('case when') || lowerQuery.includes('select case')) {
+        console.log('🚨 Conditional ORDER BY injection detected!');
+        const users = (await getFromKV('users')) as User[] || initialData.users;
+
+        if (lowerQuery.includes("password") && lowerQuery.includes("like 'a%'")) {
+          const adminPassword = users[0].password;
+          const startsWithA = adminPassword.toLowerCase().startsWith('a');
+          console.log(`Password check: starts with 'a'? ${startsWithA}`);
+
+          if (lowerQuery.includes('from products')) {
+            const products = (await getFromKV('products')) as Product[] || initialData.products;
+            return startsWithA ?
+              products.sort((a, b) => a.name.localeCompare(b.name)) :
+              products.sort((a, b) => a.price - b.price);
+          }
+        }
+      }
+
+      // Subquery ORDER BY injection
+      if (lowerQuery.includes('select') && lowerQuery.includes('from') && lowerQuery.includes('order by (select')) {
+        console.log('🚨 Subquery ORDER BY injection detected!');
+        const users = (await getFromKV('users')) as User[] || initialData.users;
+        throw new Error(`OrderBy Error: ${users[0].username}:${users[0].password}`);
+      }
+    }
+
+    // Blind SQL injection patterns
+    if (lowerQuery.includes('substring') || lowerQuery.includes('substr')) {
+      console.log('🚨 Blind SQL injection with SUBSTRING detected!');
+      const users = (await getFromKV('users')) as User[] || initialData.users;
+      const adminPassword = users[0].password;
+
+      // Extract position and character from query
+      const substrMatch = query.match(/substr.*password.*,(\d+),1.*=.*'(\w)'/i);
+      if (substrMatch) {
+        const position = parseInt(substrMatch[1]);
+        const testChar = substrMatch[2];
+        const actualChar = adminPassword[position - 1];
+
+        console.log(`Blind SQLi: Position ${position}, Testing '${testChar}', Actual '${actualChar}'`);
+
+        if (lowerQuery.includes('from products')) {
+          const products = (await getFromKV('products')) as Product[] || initialData.products;
+          return actualChar === testChar ? products : [];
+        }
       }
     }
 

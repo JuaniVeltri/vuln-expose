@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { initDatabase, executeQuery } from '@/lib/database';
 
 export async function GET(request: NextRequest) {
   try {
-    initDatabase();
+    await initDatabase();
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('id');
     const username = searchParams.get('username');
@@ -24,12 +25,17 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('Executing user query:', query);
-    const users = executeQuery(query);
+    const users = await executeQuery(query);
 
     return NextResponse.json({
       success: true,
       users,
-      query
+      query,
+      vulnerabilities: {
+        id_injection: "Try id: 1 OR 1=1",
+        username_injection: "Try username: admin' OR '1'='1",
+        role_injection: "Try role: admin' UNION SELECT password,null,null,null,null FROM users WHERE username='admin'--"
+      }
     });
   } catch (error: any) {
     return NextResponse.json({
@@ -42,13 +48,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    initDatabase();
+    await initDatabase();
     const { username, password, email, role = 'user' } = await request.json();
 
     const insertQuery = `INSERT INTO users (username, password, email, role) VALUES ('${username}', '${password}', '${email}', '${role}')`;
     console.log('Executing insert query:', insertQuery);
 
-    executeQuery(insertQuery);
+    await executeQuery(insertQuery);
 
     return NextResponse.json({
       success: true,

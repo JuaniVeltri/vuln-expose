@@ -2,11 +2,22 @@ import { NextResponse } from 'next/server';
 import { initDatabase } from '@/lib/database';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    initDatabase();
-    return NextResponse.json({ success: true, message: 'Database initialized' });
+    await initDatabase();
+    return NextResponse.json({
+      success: true,
+      message: 'Database initialized',
+      endpoints: {
+        login: '/api/auth/login',
+        search: '/api/search',
+        products: '/api/products',
+        users: '/api/users',
+        comments: '/api/comments'
+      }
+    });
   } catch (error: any) {
     return NextResponse.json({
       success: false,
